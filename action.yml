@@ -17,10 +17,7 @@ inputs:
   token:
     description: "The GitHub token."
     required: false
-  custom-prompt:
-    description: "The custom prompt to use."
-    required: false
 
 runs:
   using: "node20"
-  main: "index.js"
+  main: "dist/index.js"

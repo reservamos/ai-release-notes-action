@@ -10,3 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          token: ${{ secrets.GITHUB_TOKEN }}

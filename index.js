@@ -2,9 +2,9 @@
  * Entry point of the application
  */
 
-import { getInput, setFailed, info } from "@actions/core";
-import { getOctokit } from "@actions/github";
-import OpenAI from "openai";
+const { getInput, setFailed, info } = require("@actions/core");
+const { getOctokit } = require("@actions/github");
+const OpenAI = require("openai");
 
 /**
  * @typedef {Object} ActionInputs
