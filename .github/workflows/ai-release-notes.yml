@@ -2,6 +2,7 @@ name: "Ai release notes"
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   read-write:

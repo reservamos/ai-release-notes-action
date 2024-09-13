@@ -9,12 +9,16 @@ branding:
 inputs:
   language:
     description: "The language of the output."
-    required: false
+    required: true
+    default: "en"
   openai-api-key:
     description: "The OpenAI API key."
     required: true
   token:
     description: "The GitHub token."
+    required: false
+  custom-prompt:
+    description: "The custom prompt to use."
     required: false
 
 runs:
