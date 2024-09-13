@@ -47192,6 +47192,7 @@ async function run() {
     const releaseNotes = customPrompt; // release.body;
     info(`Release notes: ${releaseNotes}`);
 
+    info(`OpenAI key: ${openaiApiKey.slice(0, 4)}...`);
     // Call the OpenAI API
     const openai = new OpenAI({ apiKey: openaiApiKey });
 
@@ -47200,7 +47201,7 @@ async function run() {
       model: "gpt-4o",
     });
 
-    if (completion) {
+    if (completion && completion.data) {
       const response = completion.data.choices[0].message.content;
       info(`Response: ${response}`);
     } else {
