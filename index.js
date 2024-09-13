@@ -57,7 +57,13 @@ async function run() {
     const openai = new OpenAI({ apiKey: openaiApiKey });
 
     const completion = await openai.chat.completions.create({
-      messages: [{ role: "system", content: "You are a helpful assistant." }],
+      messages: [
+        {
+          role: "user",
+          content:
+            "You are a helpful assistant. Give me a fake changelog os some app, be creative.",
+        },
+      ],
       model: "gpt-4o",
     });
 
