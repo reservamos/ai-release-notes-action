@@ -47200,9 +47200,12 @@ async function run() {
       model: "gpt-4o",
     });
 
-    const response = completion.data.choices[0].message.content;
-    info(`Response: ${response}`);
-
+    if (completion) {
+      const response = completion.data.choices[0].message.content;
+      info(`Response: ${response}`);
+    } else {
+      throw new Error("Failed to generate release notes");
+    }
     // Create a comment on the pull request
   } catch (error) {
     setFailed(error.message || "Failed to run the action");
