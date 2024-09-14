@@ -46,7 +46,7 @@ async function run() {
 
   // Retrieve all commits from the PR
   const prNumber = context.payload.pull_request.number;
-  const commits = octokit.rest.pulls.listCommits({
+  const commits = await octokit.rest.pulls.listCommits({
     owner: context.repo.owner,
     repo: context.repo.repo,
     pull_number: prNumber,
@@ -63,18 +63,16 @@ async function run() {
     });
 
     const prompt =
-      "You are a DEV OP enginner, your responsability is write changelog of the new software version." +
+      "You are a DEV OP engineer, your responsibility is write changelog of the new software version." +
       "The changelog consist on useful information about the new features and bug fixes of the software." +
       "The changelog must be clear and concise, so the users can understand the changes." +
       "The changelog must be written in markdown format." +
-      `The changelog must be written in [${language}].` +
       "The changelog must use words 'add' for features, changes, improvements, updates and 'fix' for hotfixes, fixes" +
-      "The changelog must be written in the following structure" +
-      "```markdown" +
+      `The changelog must be written in the following language '${language}'. Translate everything to this language.` +
+      "The changelog must be written in the following structure:" +
       "## What's Changed" +
       "- Add new feature by @user" +
       "- Fix bug by @user" +
-      "```" +
       "Do not ask for more information, use the following information to write the changelog." +
       "The following information that made in this version (commit message, author):" +
       `${JSON.stringify(
@@ -99,13 +97,12 @@ async function run() {
 
     if (completion) {
       const response = completion.choices[0].message.content;
-      info(`Response: ${response}`);
-
       // Create the release
       await octokit.rest.repos.createRelease({
         owner: context.repo.owner,
         repo: context.repo.repo,
         tag_name: version,
+        name: version,
         body: response,
       });
     } else {
