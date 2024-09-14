@@ -1,7 +1,3 @@
-/**
- * Entry point of the application
- */
-
 const { getInput, setFailed, info } = require("@actions/core");
 const { context, getOctokit } = require("@actions/github");
 const OpenAI = require("openai");
@@ -9,6 +5,7 @@ const OpenAI = require("openai");
 /**
  * @typedef {Object} ActionInputs
  * @property {string} language - The language (defaults to "en")
+ * @property {string} [model] - The model (defaults to "gpt-4o")
  * @property {string} openaiApiKey - The OpenAI API key
  * @property {string} version - The release version
  * @property {string} [token] - The token (optional)
@@ -21,11 +18,13 @@ const OpenAI = require("openai");
 function parseInputs() {
   const openaiApiKey = getInput("openai-api-key");
   const language = getInput("language");
+  const model = getInput("model");
   const token = getInput("token");
   const version = getInput("version");
 
   return {
     language,
+    model,
     openaiApiKey,
     token,
     version,
@@ -37,7 +36,7 @@ function parseInputs() {
  */
 async function run() {
   info("Running ai release notes action");
-  const { openaiApiKey, language, token, version } = parseInputs();
+  const { openaiApiKey, language, model, token, version } = parseInputs();
   const octokit = getOctokit(token);
 
   if (context.eventName !== "pull_request") {
@@ -52,11 +51,13 @@ async function run() {
     pull_number: prNumber,
   });
 
-  // Read PR merged related commits and PR body
+  if (!commits.data.length) {
+    throw new Error("No commits found in the pull request");
+  }
 
   try {
     // Get the release notes
-    info(`OpenAI key: ${openaiApiKey.slice(0, 4)}...`);
+    info(`OpenAI key: ${openaiApiKey.slice(0, 6)}...`);
     // Call the OpenAI API
     const openai = new OpenAI({
       apiKey: openaiApiKey,
@@ -68,13 +69,12 @@ async function run() {
       "The changelog must be clear and concise, so the users can understand the changes." +
       "The changelog must be written in markdown format." +
       "The changelog must use words 'add' for features, changes, improvements, updates and 'fix' for hotfixes, fixes" +
-      `The changelog must be written in the following language '${language}'. Translate everything to this language.` +
-      "The changelog must be written in the following structure:" +
+      "The changelog must be written in the following structure:\n" +
       "## What's Changed" +
       "- Add new feature by @user" +
       "- Fix bug by @user" +
-      "Do not ask for more information, use the following information to write the changelog." +
-      "The following information that made in this version (commit message, author):" +
+      "\nDo not ask for more information." +
+      "Use only the following data to write the changelog (commit message, author):" +
       `${JSON.stringify(
         commits.data.map((c) => ({
           message: c.commit.message,
@@ -83,7 +83,8 @@ async function run() {
         })),
         null,
         2
-      )}`;
+      )}` +
+      `\nThe changelog must be written in the following language '${language}'. Translate everything to this language.`;
 
     const completion = await openai.chat.completions.create({
       messages: [
@@ -92,7 +93,7 @@ async function run() {
           content: prompt,
         },
       ],
-      model: "gpt-4o",
+      model: model || "gpt-4o",
     });
 
     if (completion) {
