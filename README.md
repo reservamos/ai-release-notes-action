@@ -30,6 +30,8 @@ To use the AI Release Notes Action, follow these steps:
           version: v1.0.0
           language: "en"
           token: ${{ secrets.GITHUB_TOKEN }}
+          model: "gpt-4o"
+          use-github-generated-notes: true
 ```
 
 5. Save the workflow file, and the action will automatically generate release notes for each new version.

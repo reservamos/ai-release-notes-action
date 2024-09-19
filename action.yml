@@ -23,6 +23,9 @@ inputs:
   model:
     description: "The model to use."
     required: false
+  use-github-generated-notes:
+    description: "Use the GitHub generated notes."
+    required: false
 
 runs:
   using: "node20"
